@@ -4,9 +4,9 @@ import * as LRU from 'lru-cache'
 export class SimpleCache implements ICache {
   readonly name: string
   private cache: LRU<string, any>
-  constructor(private ttl: number) {
+  constructor(private max: number, private ttl: number) {
     this.name = 'SimpleCache'
-    this.cache = new LRU({ max: 250, ttl: this.ttl })
+    this.cache = new LRU({ max: (this.max = 500), ttl: this.ttl })
   }
 
   public async set(key: string, value: any): Promise<void> {
