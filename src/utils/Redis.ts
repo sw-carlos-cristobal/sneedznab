@@ -4,16 +4,12 @@ import { RedisClientType, createClient } from 'redis'
 export class RedisCache implements ICache {
   readonly name: string
   private client: RedisClientType
-  constructor(
-    private url: string,
-    private user?: string,
-    private pass?: string
-  ) {
+  constructor(url: string, user?: string, pass?: string) {
     this.name = 'RedisCache'
     this.client = createClient({
-      url: this.url,
-      username: this.user ?? 'default',
-      password: this.pass ?? ''
+      url: url,
+      username: user ?? 'default',
+      password: pass ?? ''
     })
     this.client.on('error', err => {
       // Consider a more robust error handling strategy here
