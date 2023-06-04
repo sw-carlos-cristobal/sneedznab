@@ -6,7 +6,7 @@ export class SimpleCache implements ICache {
   private cache: LRU<string, any>
   constructor(private max: number, private ttl: number) {
     this.name = 'SimpleCache'
-    this.cache = new LRU({ max: (this.max = 500), ttl: this.ttl })
+    this.cache = new LRU({ max: this.max ?? 500, ttl: this.ttl })
   }
 
   public async set(key: string, value: any): Promise<void> {
