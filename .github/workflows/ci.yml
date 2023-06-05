@@ -12,8 +12,6 @@ jobs:
     runs-on: ubuntu-latest
     name: Run ESLint
     steps:
-      - name: NPM or Yarn install with caching
-        uses: bahmutov/npm-install@v1.6.0
       - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3
         with:
           fetch-depth: 0
@@ -47,8 +45,6 @@ jobs:
     runs-on: ubuntu-latest
     name: Run Typechecker
     steps:
-      - name: NPM or Yarn install with caching
-        uses: bahmutov/npm-install@v1.6.0
       - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3
         with:
           fetch-depth: 0
