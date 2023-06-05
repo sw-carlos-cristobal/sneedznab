@@ -1,17 +1,18 @@
 {
   "compilerOptions": {
     "lib": [
-      "ESNext"
+      "ES6",
+      "DOM"
     ],
-    "module": "esnext",
-    "target": "esnext",
-    // "bun-types" is the important part
+    "module": "ESNext",
+    "target": "ES6",
     "types": [
-      "bun-types"
+      "node"
     ],
     "moduleResolution": "Node",
     "skipLibCheck": true,
     "resolveJsonModule": true,
+    "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "baseUrl": "src",
     "outDir": "./dist",

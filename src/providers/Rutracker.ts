@@ -1,50 +1,47 @@
-import { rutrackerUrl } from '#/constants'
-import {
-  IProvider,
-  IRutrackerData,
-  ISneedexRelease,
-  ITorrentRelease,
-  IUsenetRelease
-} from '#interfaces/index'
-import { app } from '#/index'
-import { Utils } from '#utils/Utils'
+import { app } from '../index.js';
+import { Utils } from '../utils/Utils.js';
+import { IProvider } from '../interfaces/provider.js';
+import { IRutrackerData } from '../interfaces/rutracker.js';
+import { rutrackerUrl } from '../constants.js';
+import { ITorrentRelease } from '../interfaces/releases.js';
+import { ISneedexRelease } from '../interfaces/sneedex.js';
 
 export class Rutracker implements IProvider {
-  readonly name: string
+  readonly name: string;
   constructor() {
-    this.name = 'ruTracker'
+    this.name = 'ruTracker';
   }
 
   // provider specific fetch function to retrieve raw data
   private async fetch(query: string): Promise<IRutrackerData> {
-    Utils.debugLog(this.name, 'cache', `${this.name}_${query}`)
-    const cachedData = await app.cache.get(`${this.name}_${query}`)
+    Utils.debugLog(this.name, 'cache', `${this.name}_${query}`);
+    const cachedData = await app.cache.get(`${this.name}_${query}`);
     if (cachedData) {
-      Utils.debugLog(this.name, 'cache', `Cache hit: ${this.name}_${query}`)
-      return cachedData as IRutrackerData
+      Utils.debugLog(this.name, 'cache', `Cache hit: ${this.name}_${query}`);
+      return cachedData as IRutrackerData;
     }
-    Utils.debugLog(this.name, 'cache', `Cache miss: ${this.name}_${query}`)
+    Utils.debugLog(this.name, 'cache', `Cache miss: ${this.name}_${query}`);
 
     /* for some reason unknown to me turning query, which is just the ID into a number fixes an issue with the way that bun's fetch parses URLs.
     It works fine if I hardcode the ID in there but breaks if I throw the same exactly string in as a variable, query
     Then, typecasting it to be a number fixes it somehow!?!? Sir!?!?! */
-    const weirdFix = +query
-    const searchURL = `${rutrackerUrl}/get_tor_topic_data?by=topic_id&val=${weirdFix}`
+    const weirdFix = +query;
+    const searchURL = `${rutrackerUrl}/get_tor_topic_data?by=topic_id&val=${weirdFix}`;
 
-    Utils.debugLog(this.name, 'fetch', query)
-    Utils.debugLog(this.name, 'fetch', `Fetching data from ${searchURL}`)
-    const data = await fetch(searchURL).then(res => {
-      if (!res.ok) throw new Error(res.statusText)
-      return res.json()
-    })
+    Utils.debugLog(this.name, 'fetch', query);
+    Utils.debugLog(this.name, 'fetch', `Fetching data from ${searchURL}`);
+    const data = await fetch(searchURL).then((res) => {
+      if (!res.ok) throw new Error(res.statusText);
+      return res.json();
+    });
     Utils.debugLog(
       this.name,
       'fetch',
       `Fetched data, caching ${this.name}_${query}`
-    )
-    await app.cache.set(`${this.name}_${query}`, data)
+    );
+    await app.cache.set(`${this.name}_${query}`, data);
 
-    return data as IRutrackerData
+    return data as IRutrackerData;
   }
 
   // get function to standardize the returned data to make things easier to work with and plug-and-play
@@ -55,22 +52,22 @@ export class Rutracker implements IProvider {
     // first check if there even is an rutracker link in sneedexData.best_links and sneedexData.alt_links
     const bestReleaseLinks = sneedexData.best_links.length
       ? sneedexData.best_links.split(' ')
-      : sneedexData.alt_links.split(' ')
+      : sneedexData.alt_links.split(' ');
 
     const threadLink = bestReleaseLinks.find((url: string) =>
       url.includes('https://rutracker.org/forum/viewtopic.php?t=')
-    )
-    if (!threadLink) return null
+    );
+    if (!threadLink) return null;
 
     // extract the thread ID from the link
     // https://rutracker.org/forum/viewtopic.php?t=4035529 where 4035529 is the thread ID
-    const threadID = threadLink.split('t=')[1]
+    const threadID = threadLink.split('t=')[1];
 
     // call the ruTracker API
-    const data = await this.fetch(threadID)
+    const data = await this.fetch(threadID);
 
     // Handle no results
-    if (!data || data.result[threadID] === null) return null
+    if (!data || data.result[threadID] === null) return null;
 
     return [
       {
@@ -92,6 +89,6 @@ export class Rutracker implements IProvider {
         grabs: data.result[threadID].dl_count,
         type: 'torrent'
       }
-    ] as ITorrentRelease[]
+    ] as ITorrentRelease[];
   }
 }

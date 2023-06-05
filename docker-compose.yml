@@ -1,24 +1,28 @@
-version: '3.7'
+version: "3.8"
 
 services:
   sneedznab:
-    image: ghcr.io/turbocheetah/sneedznab:latest
+    image: ghcr.io/sw-carlos-cristobal/sneedznab:latest
     container_name: sneedznab
     environment:
       - NYAA_ENABLED=true
       # AnimeTosho is only useful if you want NZBs
-      - ANIMETOSHO_ENABLED=false
+      - ANIMETOSHO_ENABLED=true
       - RUTRACKER_ENABLED=true
       # Only enable AB if you have access to it
       - ANIMEBYTES_ENABLED=false
       - ANIMEBYTES_PASSKEY=
       - ANIMEBYTES_USERNAME=
       # If using Redis cache set the URL and token using the values from Upstash
-      - REDIS_ENABLED=false
-      - REDIS_URL=
+      - REDIS_ENABLED=true
+      - REDIS_URL=redis://192.168.1.100:6379
       - REDIS_TOKEN=
-      - CACHE_TTL=120
+      # Cache TTL in milliseconds
+      - CACHE_TTL=600000
+      - MAX_ENTRIES=1000
       - DEBUG=true
+      - REDIS_USERNAME=default
+      - REDIS_PASSWORD=
     ports:
-      - '3000:3000'
-    restart: 'unless-stopped'
+      - "3000:3000"
+    restart: "unless-stopped"

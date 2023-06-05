@@ -2,23 +2,20 @@ FROM oven/bun:0.6.7 as runner
 
 WORKDIR /app
 
-ENV GROUP=bun
-ENV USER=sneedex
-ENV UID=1001
+ARG USERNAME=sneedex
+ARG USER_UID=1001
+ARG USER_GID=$USER_UID
 
-RUN adduser \
-  --system \
-  --disabled-password \
-  --gecos "" \
-  --home "/nonexistent" \
-  --shell "/sbin/nologin" \
-  --no-create-home \
-  --uid "${UID}" \
-  "${USER}"
+RUN groupadd --gid $USER_GID $USERNAME \
+  && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
+  && apt-get update \
+  && apt-get install -y sudo \
+  && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
+  && chmod 0440 /etc/sudoers.d/$USERNAME
 
-COPY package.json bun.lockb ./
+COPY package.json yarn.lock ./
 
-RUN bun install
+RUN yarn install
 
 COPY . .
 
@@ -28,4 +25,4 @@ USER sneedex
 
 EXPOSE 3000
 
-CMD ["bun", "run", "start"]
+CMD ["yarn", "start"]

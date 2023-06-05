@@ -1,22 +1,25 @@
-import { ICache } from '#interfaces/index'
-import LRU from 'lru-cache'
+import { ICache } from '#interfaces/index';
+import { LRUCache } from 'lru-cache';
+import { promisify } from 'util';
 
 export class SimpleCache implements ICache {
-  readonly name: string
-  private cache: LRU<string, any>
+  readonly name: string;
+  private cache: LRUCache<string, any>;
   constructor(private max: number, private ttl: number) {
-    this.name = 'SimpleCache'
-    this.max = max ?? 500
-    this.ttl = ttl ?? 300
-    this.cache = new LRU({ max: this.max, ttl: this.ttl })
+    console.log(max, ttl);
+    this.name = 'SimpleCache';
+    this.max = max ?? 500;
+    this.ttl = ttl ?? 1000 * 60 * 60; // 1 hour
+    this.cache = new LRUCache({ max: this.max, ttl: this.ttl });
   }
 
   public async set(key: string, value: any): Promise<void> {
-    this.cache.set(key, value)
-    return
+    const setAsync = promisify(this.cache.set).bind(this.cache);
+    return setAsync(key, value);
   }
 
   public async get(key: string): Promise<any> {
-    return this.cache.get(key)
+    const getAsync = promisify(this.cache.get).bind(this.cache);
+    return getAsync(key);
   }
 }

@@ -4,13 +4,13 @@ import {
   ITorrentRelease,
   IUsenetRelease,
   ISneedexRelease
-} from '#interfaces/index'
+} from '#interfaces/index';
 
 export class ProviderRepository implements IProviderRepository {
-  private providers: IProvider[]
+  private providers: IProvider[];
 
   constructor(providers: IProvider[]) {
-    this.providers = providers
+    this.providers = providers;
   }
 
   public async getResults(
@@ -20,11 +20,11 @@ export class ProviderRepository implements IProviderRepository {
     const results = (
       await Promise.all(
         this.providers.map(
-          async provider => await provider.get(sneedQuery, release)
+          async (provider) => await provider.get(sneedQuery, release)
         )
       )
-    ).flat()
+    ).flat();
 
-    return results
+    return results;
   }
 }

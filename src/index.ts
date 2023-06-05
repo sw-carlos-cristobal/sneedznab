@@ -1,8 +1,14 @@
-import { App } from '#/app'
-import { ApiRoute } from '#routes/api'
-import { AnimeBytes, AnimeTosho, Nyaa, Rutracker } from '#providers/index'
-import { RedisCache } from '#utils/Redis'
-import { SimpleCache } from '#utils/SimpleCache'
+import { App } from './app.js';
+import { Nyaa } from './providers/Nyaa.js';
+import { AnimeBytes } from './providers/AnimeBytes.js';
+import { AnimeTosho } from './providers/AnimeTosho.js';
+import { Rutracker } from './providers/Rutracker.js';
+import { ApiRoute } from './routes/api.js';
+import { RedisCache } from './utils/Redis.js';
+import { SimpleCache } from './utils/SimpleCache.js';
+import { Env } from 'hono';
+import { ExecutionContext } from 'hono/dist/types/context.js';
+import { serve } from '@hono/node-server';
 
 export const app = new App(
   process.env.REDIS_ENABLED.toLowerCase() === 'true'
@@ -29,11 +35,16 @@ export const app = new App(
     process.env.RUTRACKER_ENABLED.toLowerCase() === 'true'
       ? new Rutracker()
       : null
-  ].filter(provider => provider !== null),
+  ].filter((provider) => provider !== null),
   [new ApiRoute()]
-)
+);
 
 export default {
   port: process.env.port || 3000,
-  fetch: app.getServer().fetch
-}
+  //fetch: app.getServer().fetch
+  fetch(request: Request, env: Env, ctx: ExecutionContext) {
+    return app.getServer().fetch(request, env, ctx);
+  }
+};
+
+serve(app.getServer());

@@ -1,24 +1,26 @@
-import { Hono } from 'hono'
-import { IRoute, ITorrentRelease, IUsenetRelease } from '#interfaces/index'
-import { app } from '#/index'
-import { Utils } from '#utils/Utils'
-import { rssBuilder } from '#/utils/rss'
+import { Hono } from 'hono';
+import { IRoute } from '../interfaces/route.js';
+import { rssBuilder } from '../utils/rss.js';
+import { Utils } from '../utils/Utils.js';
+import { app } from '../index.js';
+import { IUsenetRelease } from '../interfaces/releases.js';
+import { ITorrentRelease } from '../interfaces/releases.js';
 
-export const apiHono = new Hono()
+export const apiHono = new Hono();
 export class ApiRoute implements IRoute {
-  public path = '/api'
-  public router: Hono
+  public path = '/api';
+  public router: Hono;
   constructor() {
-    this.router = new Hono()
-    this.initializeRoutes()
+    this.router = new Hono();
+    this.initializeRoutes();
   }
 
   public getRouter(): Hono {
-    return this.router
+    return this.router;
   }
 
   private initializeRoutes() {
-    this.router.get('/', async c => {
+    this.router.get('/', async (c) => {
       if (c.req.query('t') === 'caps') {
         return c.body(
           `<?xml version="1.0" encoding="UTF-8"?>
@@ -38,26 +40,26 @@ export class ApiRoute implements IRoute {
       </caps>`,
           200,
           { 'content-type': 'text/xml' }
-        )
+        );
       } else if (c.req.query('t') === 'search') {
-        const returnType = c.req.query('response')
-        let query = c.req.query('q')
+        const returnType = c.req.query('response');
+        let query = c.req.query('q');
         // if query is unspecified, e.g when Prowlarr is testing it, set it to Akira to test it
         // Akira because it's also on usenet
-        if (!query) query = 'Akira'
-        query = query.trim()
+        if (!query) query = 'Akira';
+        query = query.trim();
 
         // Sonarr requests in the format Attack on Titan : S04E28 (87)
         // TODO: somehow make this work for titles like RE:Zero since it has a colon in it
-        const sonarrQuery = query.split(' : ')[0].replace(/ \(\d{4}\)/gi, '')
+        const sonarrQuery = query.split(' : ')[0].replace(/ \(\d{4}\)/gi, '');
 
         // check cache first
-        Utils.debugLog('API', 'cache', `api_${query}`)
-        const cachedData = await app.cache.get(`api_${sonarrQuery}`)
+        Utils.debugLog('API', 'cache', `api_${query}`);
+        const cachedData = await app.cache.get(`api_${sonarrQuery}`);
 
         if (cachedData) {
-          Utils.debugLog('API', 'cache', `Cache hit: api_${query}`)
-          if (returnType === 'json') return c.json(cachedData)
+          Utils.debugLog('API', 'cache', `Cache hit: api_${query}`);
+          if (returnType === 'json') return c.json(cachedData);
 
           return c.body(
             rssBuilder(cachedData.usenetReleases, cachedData.torrentReleases),
@@ -65,15 +67,15 @@ export class ApiRoute implements IRoute {
             {
               application: 'rss+xml'
             }
-          )
+          );
         }
-        Utils.debugLog('API', 'cache', `Cache miss: api_${query}`)
+        Utils.debugLog('API', 'cache', `Cache miss: api_${query}`);
 
-        Utils.debugLog('API', 'fetch', sonarrQuery)
-        const sneedexData = await app.sneedex.fetch(sonarrQuery)
+        Utils.debugLog('API', 'fetch', sonarrQuery);
+        const sneedexData = await app.sneedex.fetch(sonarrQuery);
 
-        const usenetReleases: IUsenetRelease[] = []
-        const torrentReleases: ITorrentRelease[] = []
+        const usenetReleases: IUsenetRelease[] = [];
+        const torrentReleases: ITorrentRelease[] = [];
 
         // Return empty if no results
         if (!sneedexData) {
@@ -81,14 +83,14 @@ export class ApiRoute implements IRoute {
             'API',
             'fetch',
             `No results found, caching api_${query}`
-          )
+          );
           await app.cache.set(`api_${sonarrQuery}`, {
             usenetReleases,
             torrentReleases
-          })
+          });
 
           if (returnType === 'json') {
-            return c.json({ usenetReleases, torrentReleases }, 404)
+            return c.json({ usenetReleases, torrentReleases }, 404);
           } else {
             return c.body(
               `<?xml version="1.0" encoding="UTF-8"?>
@@ -99,7 +101,7 @@ export class ApiRoute implements IRoute {
     </rss>`,
               200,
               { application: 'rss+xml' }
-            )
+            );
           }
         }
 
@@ -108,19 +110,19 @@ export class ApiRoute implements IRoute {
           const sneedQuery = {
             title: sneedexData.title.replace(/ \(\d{4}\)/gi, ''),
             alias: sneedexData.alias.replace(/ \(\d{4}\)/gi, '')
-          }
+          };
 
           const results = await app.providerRepository.getResults(
             sneedQuery,
             release
-          )
+          );
 
           // push each result to either usenetReleases or torrentReleases
           for (const result of results) {
-            if (!result) continue
+            if (!result) continue;
             result.type === 'usenet'
               ? usenetReleases.push(result)
-              : torrentReleases.push(result)
+              : torrentReleases.push(result);
           }
         }
 
@@ -128,17 +130,17 @@ export class ApiRoute implements IRoute {
           'API',
           'fetch',
           `Fetched data, caching api_${sonarrQuery}`
-        )
+        );
         await app.cache.set(`api_${sonarrQuery}`, {
           usenetReleases,
           torrentReleases
-        })
+        });
 
         if (returnType === 'json') {
           return c.json(
             { usenetReleases, torrentReleases },
             usenetReleases.length + torrentReleases.length ? 200 : 404
-          )
+          );
         }
 
         // if there are no releases, return a 200 with the proper torznab response
@@ -152,16 +154,16 @@ export class ApiRoute implements IRoute {
     </rss>`,
             200,
             { application: 'rss+xml' }
-          )
+          );
         }
 
         // for each release, add an item to the rss feed
-        const rss = rssBuilder(usenetReleases, torrentReleases)
+        const rss = rssBuilder(usenetReleases, torrentReleases);
 
         return c.body(rss, 200, {
           application: 'rss+xml'
-        })
+        });
       }
-    })
+    });
   }
 }
