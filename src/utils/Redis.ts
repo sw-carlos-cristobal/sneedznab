@@ -1,6 +1,7 @@
 import { ICache } from '#interfaces/index'
 import { RedisClientType } from '@redis/client'
-import { RedisFunctions, RedisModules, RedisScripts, createClient } from 'redis'
+import { createClient } from 'redis'
+import { promisify } from 'util'
 
 export class RedisCache implements ICache {
   readonly name: string
@@ -14,23 +15,17 @@ export class RedisCache implements ICache {
       password: pass
     })
     this.client.on('error', err => {
-      // Consider a more robust error handling strategy here
-      console.log('Redis error: ', err)
-    })
-    this.client.on('connect', () => {
-      console.log('Redis connected')
-    })
-    this.client.on('ready', () => {
-      console.log('Redis ready')
+      console.error('Redis error: ', err)
     })
   }
 
-  public async set(key: string, value: string): Promise<void> {
-    await this.client.set(key, value)
+  async set(key: string, value: any): Promise<void> {
+    const setAsync = promisify(this.client.set).bind(this.client)
+    return setAsync(key, value)
   }
 
-  public async get(key: string): Promise<string | null> {
-    const value = await this.client.get(key)
-    return value
+  async get(key: string): Promise<string | null> {
+    const getAsync = promisify(this.client.get).bind(this.client)
+    return getAsync(key)
   }
 }
