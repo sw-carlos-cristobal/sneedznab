@@ -14,10 +14,27 @@ export class RedisCache implements ICache {
       username: user,
       password: pass
     });
+
+    this.client.on('connect', () => {
+      console.log('Redis client connected');
+    });
+    
+    this.client.on('ready', () => {
+      console.log('Redis client ready');
+    });
+    
     this.client.on('error', (err) => {
       console.error('Redis error: ', err);
     });
-    this.client.connect();
+    
+    this.client.on('end', () => {
+      console.log('Redis client connection ended');
+    });
+
+    this.client.on('reconnecting', () => {
+      console.log('Redis client reconnecting');
+    });
+    
   }
 
   async set(key: string, value: any): Promise<void> {

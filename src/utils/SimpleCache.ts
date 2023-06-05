@@ -1,4 +1,4 @@
-import { ICache } from '#interfaces/index';
+import { ICache } from '../interfaces/cache.js';
 import { LRUCache } from 'lru-cache';
 import { promisify } from 'util';
 
@@ -14,12 +14,16 @@ export class SimpleCache implements ICache {
   }
 
   public async set(key: string, value: any): Promise<void> {
-    const setAsync = promisify(this.cache.set).bind(this.cache);
-    return setAsync(key, value);
+    return new Promise<void>((resolve) => {
+      this.cache.set(key, value);
+      resolve();
+    });
   }
-
+  
   public async get(key: string): Promise<any> {
-    const getAsync = promisify(this.cache.get).bind(this.cache);
-    return getAsync(key);
+    return new Promise<any>((resolve) => {
+      resolve(this.cache.get(key));
+    });
   }
+  
 }

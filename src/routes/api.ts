@@ -1,4 +1,4 @@
-import { Hono } from 'hono';
+import { Context, Hono, HonoRequest } from 'hono';
 import { IRoute } from '../interfaces/route.js';
 import { rssBuilder } from '../utils/rss.js';
 import { Utils } from '../utils/Utils.js';
@@ -20,9 +20,12 @@ export class ApiRoute implements IRoute {
   }
 
   private initializeRoutes() {
-    this.router.get('/', async (c) => {
-      if (c.req.query('t') === 'caps') {
-        return c.body(
+    this.router.get('/', async (c: Context) => {
+      const receivedRequest: HonoRequest = c.req;
+      const makeResponseBody = c.body;
+      const makeResponseJson = c.json;
+      if (receivedRequest.query('t') === 'caps') {
+        return makeResponseBody(
           `<?xml version="1.0" encoding="UTF-8"?>
       <caps>
         <server version="1.0" title="Sneedex" strapline="Anime releases with the best video+subs" url="https://sneedex.moe/"/>
@@ -41,9 +44,9 @@ export class ApiRoute implements IRoute {
           200,
           { 'content-type': 'text/xml' }
         );
-      } else if (c.req.query('t') === 'search') {
-        const returnType = c.req.query('response');
-        let query = c.req.query('q');
+      } else if (receivedRequest.query('t') === 'search') {
+        const returnType = receivedRequest.query('response');
+        let query = receivedRequest.query('q');
         // if query is unspecified, e.g when Prowlarr is testing it, set it to Akira to test it
         // Akira because it's also on usenet
         if (!query) query = 'Akira';
@@ -59,9 +62,9 @@ export class ApiRoute implements IRoute {
 
         if (cachedData) {
           Utils.debugLog('API', 'cache', `Cache hit: api_${query}`);
-          if (returnType === 'json') return c.json(cachedData);
+          if (returnType === 'json') return makeResponseJson(cachedData);
 
-          return c.body(
+          return makeResponseBody(
             rssBuilder(cachedData.usenetReleases, cachedData.torrentReleases),
             200,
             {
@@ -90,9 +93,9 @@ export class ApiRoute implements IRoute {
           });
 
           if (returnType === 'json') {
-            return c.json({ usenetReleases, torrentReleases }, 404);
+            return makeResponseJson({ usenetReleases, torrentReleases }, 404);
           } else {
-            return c.body(
+            return makeResponseBody(
               `<?xml version="1.0" encoding="UTF-8"?>
     <rss version="1.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:newznab="http://www.newznab.com/DTD/2010/feeds/attributes/" xmlns:torznab="http://torznab.com/schemas/2015/feed">
     <channel>
@@ -137,7 +140,7 @@ export class ApiRoute implements IRoute {
         });
 
         if (returnType === 'json') {
-          return c.json(
+          return makeResponseJson(
             { usenetReleases, torrentReleases },
             usenetReleases.length + torrentReleases.length ? 200 : 404
           );
@@ -145,7 +148,7 @@ export class ApiRoute implements IRoute {
 
         // if there are no releases, return a 200 with the proper torznab response
         if (!usenetReleases.length && !torrentReleases.length) {
-          return c.body(
+          return makeResponseBody(
             `<?xml version="1.0" encoding="UTF-8"?>
     <rss version="1.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:newznab="http://www.newznab.com/DTD/2010/feeds/attributes/" xmlns:torznab="http://torznab.com/schemas/2015/feed">
     <channel>
@@ -160,7 +163,7 @@ export class ApiRoute implements IRoute {
         // for each release, add an item to the rss feed
         const rss = rssBuilder(usenetReleases, torrentReleases);
 
-        return c.body(rss, 200, {
+        return makeResponseBody(rss, 200, {
           application: 'rss+xml'
         });
       }
