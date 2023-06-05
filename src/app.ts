@@ -49,7 +49,7 @@ export class App {
   }
 
   private initializeMiddlewares() {
-    this.app.use('*', logger(console.log));
+    this.app.use('*', logger());
     this.app.onError((err, c) => {
       console.error(err);
       return c.json({ message: err.message }, 500);
