@@ -18,6 +18,7 @@
         "trailingComma": "none",
         "endOfLine": "auto"
       }
-    ]
+    ],
+    "no-trailing-spaces": "error"
   }
 }

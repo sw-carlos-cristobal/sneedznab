@@ -1,6 +1,5 @@
-import { ICache } from '../interfaces/cache.js';
 import { LRUCache } from 'lru-cache';
-import { promisify } from 'util';
+import { ICache } from '../interfaces/cache.js';
 
 export class SimpleCache implements ICache {
   readonly name: string;
@@ -19,11 +18,10 @@ export class SimpleCache implements ICache {
       resolve();
     });
   }
-  
+
   public async get(key: string): Promise<any> {
     return new Promise<any>((resolve) => {
       resolve(this.cache.get(key));
     });
   }
-  
 }
