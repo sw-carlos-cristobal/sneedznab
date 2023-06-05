@@ -1,12 +1,14 @@
 import { ICache } from '#interfaces/index'
-import * as LRU from 'lru-cache'
+import LRU from 'lru-cache'
 
 export class SimpleCache implements ICache {
   readonly name: string
   private cache: LRU<string, any>
   constructor(private max: number, private ttl: number) {
     this.name = 'SimpleCache'
-    this.cache = new LRU({ max: this.max ?? 500, ttl: this.ttl })
+    this.max = max ?? 500
+    this.ttl = ttl ?? 300
+    this.cache = new LRU({ max: this.max, ttl: this.ttl })
   }
 
   public async set(key: string, value: any): Promise<void> {
