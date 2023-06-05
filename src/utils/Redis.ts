@@ -17,6 +17,7 @@ export class RedisCache implements ICache {
     this.client.on('error', (err) => {
       console.error('Redis error: ', err);
     });
+    this.client.connect();
   }
 
   async set(key: string, value: any): Promise<void> {
