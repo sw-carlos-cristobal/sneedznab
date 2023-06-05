@@ -1,4 +1,5 @@
-FROM oven/bun:0.6.7 as runner
+FROM node:20.2.0 as build
+ARG BUILD_CONTEXT
 
 WORKDIR /app
 
@@ -13,7 +14,8 @@ RUN groupadd --gid $USER_GID $USERNAME \
   && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
   && chmod 0440 /etc/sudoers.d/$USERNAME
 
-COPY package.json yarn.lock ./
+COPY package.json ./
+COPY yarn.lock ./
 
 RUN yarn install
 
