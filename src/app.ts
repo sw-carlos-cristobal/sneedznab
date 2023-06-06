@@ -1,11 +1,11 @@
 import { Hono } from 'hono';
 import { logger } from 'hono/logger';
+import pkg from '../package.json' assert { type: 'json' };
 import { ICache } from './interfaces/cache.js';
 import { IProvider } from './interfaces/provider.js';
 import { IRoute } from './interfaces/route.js';
 import { ProviderRepository } from './providers/ProviderRepository.js';
 import { Sneedex } from './utils/Sneedex.js';
-import pkg from '../package.json' assert { type: 'json' };
 
 export class App {
   public app: Hono;
@@ -25,6 +25,10 @@ export class App {
 
     this.initializeMiddlewares();
     this.initializeRoutes();
+
+    if (cache.name === 'RedisCache') {
+      this.cache.connect();
+    }
 
     console.log(
       `Sneedznab v${pkg.version} started\nCache: ${

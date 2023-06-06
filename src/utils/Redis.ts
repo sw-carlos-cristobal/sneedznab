@@ -1,9 +1,9 @@
-import { createClient } from 'redis';
+import { createClient, RedisClientType } from 'redis';
 import { ICache } from '../interfaces/cache.js';
 
 export class RedisCache implements ICache {
   readonly name: string;
-  private client: any;
+  private client: RedisClientType;
   constructor(url: string, user?: string, pass?: string) {
     this.name = 'RedisCache';
     console.log(`Creating new Redis client with URL: ${url}`);
@@ -12,8 +12,8 @@ export class RedisCache implements ICache {
       username: user,
       password: pass,
       socket: {
-        port: 6379,
-      },
+        port: 6379
+      }
     });
 
     this.client.on('connect', () => {
@@ -35,6 +35,10 @@ export class RedisCache implements ICache {
     this.client.on('reconnecting', () => {
       console.log('Redis client reconnecting');
     });
+  }
+
+  public async connect(): Promise<void> {
+    return await this.client.connect();
   }
 
   public async set(key: string, value: any): Promise<void> {

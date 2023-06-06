@@ -1,14 +1,14 @@
+import { serve } from '@hono/node-server';
+import { Env } from 'hono';
+import { ExecutionContext } from 'hono/dist/types/context.js';
 import { App } from './app.js';
-import { Nyaa } from './providers/Nyaa.js';
 import { AnimeBytes } from './providers/AnimeBytes.js';
 import { AnimeTosho } from './providers/AnimeTosho.js';
+import { Nyaa } from './providers/Nyaa.js';
 import { Rutracker } from './providers/Rutracker.js';
 import { ApiRoute } from './routes/api.js';
 import { RedisCache } from './utils/Redis.js';
 import { SimpleCache } from './utils/SimpleCache.js';
-import { Env } from 'hono';
-import { ExecutionContext } from 'hono/dist/types/context.js';
-import { serve } from '@hono/node-server';
 
 export const app = new App(
   process.env.REDIS_ENABLED.toLowerCase() === 'true'
