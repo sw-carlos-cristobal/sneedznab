@@ -11,7 +11,7 @@
     "dev": "nodemon",
     "lint": "eslint --ignore-path .gitignore --ext .ts src/",
     "lint:fix": "yarn lint --fix && prettier --write src/",
-    "curl": "curl -v http://localhost:3000/api",
+    "curl": "curl -v http://localhost:3000/api?t=search&q=akira",
     "typecheck": "tsc"
   },
   "repository": {

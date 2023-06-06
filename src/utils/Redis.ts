@@ -46,7 +46,7 @@ export class RedisCache implements ICache {
     if (typeof value === 'object') {
       value = JSON.stringify(value);
     }
-    await this.client.set(key, value, {EX: this.ttl});
+    await this.client.set(key, value, { EX: this.ttl });
     return;
   }
 
