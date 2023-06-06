@@ -4,8 +4,9 @@ import { ICache } from '../interfaces/cache.js';
 export class RedisCache implements ICache {
   readonly name: string;
   private client: RedisClientType;
-  constructor(url: string, user?: string, pass?: string) {
+  constructor(url: string, private ttl?: number, user?: string, pass?: string) {
     this.name = 'RedisCache';
+    this.ttl = ttl ?? 1000 * 60 * 60; // 1 hour
     console.log(`Creating new Redis client with URL: ${url}`);
     this.client = createClient({
       url: url,
@@ -42,11 +43,19 @@ export class RedisCache implements ICache {
   }
 
   public async set(key: string, value: any): Promise<void> {
+    if (typeof value === 'object') {
+      value = JSON.stringify(value);
+    }
     await this.client.set(key, value);
     return;
   }
 
   public async get(key: string): Promise<any> {
-    return await this.client.get(key);
+    try {
+      const parsed = JSON.parse(await this.client.get(key));
+      return parsed;
+    } catch {
+      return await this.client.get(key);
+    }
   }
 }

@@ -1,8 +1,8 @@
 import Fuse from 'fuse.js';
-import { app } from '../index.js';
-import { Utils } from './Utils.js';
-import { ISneedexData, IRawSneedexData } from '../interfaces/sneedex.js';
 import { sneedexUrl } from '../constants.js';
+import { app } from '../index.js';
+import { IRawSneedexData, ISneedexData } from '../interfaces/sneedex.js';
+import { Utils } from './Utils.js';
 
 export class Sneedex {
   readonly name: string;

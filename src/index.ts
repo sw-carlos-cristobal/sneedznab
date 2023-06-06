@@ -14,6 +14,7 @@ export const app = new App(
   process.env.REDIS_ENABLED.toLowerCase() === 'true'
     ? new RedisCache(
         process.env.REDIS_URL,
+        +process.env.CACHE_TTL,
         process.env.REDIS_USERNAME,
         process.env.REDIS_PASSWORD
       )
