@@ -1,17 +1,19 @@
-import { ICache } from '../interfaces/cache.js';
-import { RedisClientType } from '@redis/client';
 import { createClient } from 'redis';
+import { ICache } from '../interfaces/cache.js';
 
 export class RedisCache implements ICache {
   readonly name: string;
-  private client: RedisClientType;
+  private client: any;
   constructor(url: string, user?: string, pass?: string) {
     this.name = 'RedisCache';
     console.log(`Creating new Redis client with URL: ${url}`);
     this.client = createClient({
       url: url,
       username: user,
-      password: pass
+      password: pass,
+      socket: {
+        port: 6379,
+      },
     });
 
     this.client.on('connect', () => {
@@ -35,12 +37,12 @@ export class RedisCache implements ICache {
     });
   }
 
-  async set(key: string, value: any): Promise<void> {
-    this.client.set(key, value);
+  public async set(key: string, value: any): Promise<void> {
+    await this.client.set(key, value);
     return;
   }
 
-  async get(key: string): Promise<string | null> {
-    return this.client.get(key);
+  public async get(key: string): Promise<any> {
+    return await this.client.get(key);
   }
 }
