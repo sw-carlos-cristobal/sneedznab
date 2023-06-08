@@ -17,11 +17,19 @@ export class Nyaa implements IProvider {
     Utils.debugLog(this.name, 'cache', `${this.name}_${query}`);
     const cachedData: INyaaData = await app.cache.get(`${this.name}_${query}`);
     if (cachedData) {
-      Utils.debugLog(this.name, 'cache', `Cache hit: ${this.name}_${query}`);
+      Utils.debugLog(
+        this.name,
+        'cache',
+        `Cache hit with key: [${this.name}_${query}]`
+      );
       Utils.debugLog(this.name, 'title-result', `${cachedData.title}`);
       return cachedData;
     }
-    Utils.debugLog(this.name, 'cache', `Cache miss: ${this.name}_${query}`);
+    Utils.debugLog(
+      this.name,
+      'cache',
+      `Cache miss with key: [${this.name}_${query}]`
+    );
 
     const scrapeUrl = `https://nyaa.si/view/${query}`;
     Utils.debugLog(this.name, 'fetch', query);
@@ -61,7 +69,7 @@ export class Nyaa implements IProvider {
     Utils.debugLog(
       this.name,
       'fetch',
-      `Fetched data, caching ${this.name}_${query}`
+      `Fetched data, caching with key: [${this.name}_${query}]`
     );
     await app.cache.set(`${this.name}_${query}`, scrapedData);
 

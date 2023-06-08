@@ -56,11 +56,15 @@ export class ApiRoute implements IRoute {
         const sonarrQuery = query.split(' : ')[0].replace(/ \(\d{4}\)/gi, '');
 
         // check cache first
-        Utils.debugLog('API', 'cache', `api_${query}`);
+        Utils.debugLog(
+          'API',
+          'cache',
+          `Checking cache for key: [api_${query}]`
+        );
         const cachedData = await app.cache.get(`api_${sonarrQuery}`);
 
         if (cachedData) {
-          Utils.debugLog('API', 'cache', `Cache hit: api_${query}`);
+          Utils.debugLog('API', 'cache', `Cache hit with key: [api_${query}]`);
           if (returnType === 'json') return makeResponseJson(cachedData);
 
           return makeResponseBody(
@@ -71,7 +75,7 @@ export class ApiRoute implements IRoute {
             }
           );
         }
-        Utils.debugLog('API', 'cache', `Cache miss: api_${query}`);
+        Utils.debugLog('API', 'cache', `Cache miss: [api_${query}]`);
 
         Utils.debugLog('API', 'fetch', sonarrQuery);
         const sneedexData = await app.sneedex.fetch(sonarrQuery);
@@ -84,7 +88,7 @@ export class ApiRoute implements IRoute {
           Utils.debugLog(
             'API',
             'fetch',
-            `No results found, caching api_${query}`
+            `No results found, caching with key: [api_${query}]`
           );
           await app.cache.set(`api_${sonarrQuery}`, {
             usenetReleases,
@@ -131,7 +135,7 @@ export class ApiRoute implements IRoute {
         Utils.debugLog(
           'API',
           'fetch',
-          `Fetched data, caching api_${sonarrQuery}`
+          `Fetched data, caching with key: [api_${sonarrQuery}]`
         );
         await app.cache.set(`api_${sonarrQuery}`, {
           usenetReleases,

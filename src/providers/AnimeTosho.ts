@@ -19,13 +19,21 @@ export class AnimeTosho implements IProvider {
       `${this.name}_${query}`
     );
     if (cachedData) {
-      Utils.debugLog(this.name, 'cache', `Cache hit: ${this.name}_${query}`);
+      Utils.debugLog(
+        this.name,
+        'cache',
+        `Cache hit with key: [${this.name}_${query}]`
+      );
       cachedData.forEach((data: IToshoData) => {
         Utils.debugLog(this.name, 'title-result', `${data.title}`);
       });
       return cachedData;
     }
-    Utils.debugLog(this.name, 'cache', `Cache miss: ${this.name}_${query}`);
+    Utils.debugLog(
+      this.name,
+      'cache',
+      `Cache miss with key: [${this.name}_${query}]`
+    );
 
     const searchURL = `${toshoUrl}?t=search&extended=1&limit=100&offset=0&q=${encodeURIComponent(
       query

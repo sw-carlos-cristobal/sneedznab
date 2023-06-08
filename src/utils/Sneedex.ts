@@ -12,24 +12,36 @@ export class Sneedex {
 
   public async fetch(query: string): Promise<ISneedexData> {
     // check the cache to see if a match has already been found
-    Utils.debugLog(this.name, 'cache', `${this.name}_${query}`);
+    Utils.debugLog(
+      this.name,
+      'cache',
+      `Checking cache with key: [${this.name}_${query}]`
+    );
     const cachedData = await app.cache.get(`${this.name}_${query}`);
     if (cachedData) {
-      Utils.debugLog(this.name, 'cache', `Cache hit: ${this.name}_${query}`);
+      Utils.debugLog(
+        this.name,
+        'cache',
+        `Cache hit with key: [${this.name}_${query}]`
+      );
       return cachedData as ISneedexData;
     }
-    Utils.debugLog(this.name, 'cache', `Cache miss: ${this.name}_${query}`);
+    Utils.debugLog(
+      this.name,
+      'cache',
+      `Cache miss with key: [${this.name}_${query}]`
+    );
 
     // check the cache for the raw response from sneedex.moe
     let sneedexData: IRawSneedexData[];
     const sneedexCache = await app.cache.get(`${this.name}`);
 
     if (sneedexCache) {
-      Utils.debugLog(this.name, 'cache', `Cache hit: ${this.name}`);
+      Utils.debugLog(this.name, 'cache', `Cache hit with key: [${this.name}]`);
       sneedexData = sneedexCache as IRawSneedexData[];
     } else {
       // if the cache is empty, fetch the data from sneedex.moe
-      Utils.debugLog(this.name, 'cache', `Cache miss: ${this.name}`);
+      Utils.debugLog(this.name, 'cache', `Cache miss with key: [${this.name}]`);
       const searchURL = `${sneedexUrl}/public/indexer`;
       Utils.debugLog(this.name, 'fetch', `Fetching data from ${searchURL}`);
       sneedexData = await fetch(searchURL).then((res) => {

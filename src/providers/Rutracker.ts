@@ -19,11 +19,19 @@ export class Rutracker implements IProvider {
       `${this.name}_${query}`
     );
     if (cachedData) {
-      Utils.debugLog(this.name, 'cache', `Cache hit: ${this.name}_${query}`);
+      Utils.debugLog(
+        this.name,
+        'cache',
+        `Cache hit with key: [${this.name}_${query}]`
+      );
       Utils.debugLog(this.name, 'result', `${cachedData.result}`);
       return cachedData;
     }
-    Utils.debugLog(this.name, 'cache', `Cache miss: ${this.name}_${query}`);
+    Utils.debugLog(
+      this.name,
+      'cache',
+      `Cache miss with key: [${this.name}_${query}]`
+    );
 
     /* for some reason unknown to me turning query, which is just the ID into a number fixes an issue with the way that bun's fetch parses URLs.
     It works fine if I hardcode the ID in there but breaks if I throw the same exactly string in as a variable, query
@@ -40,7 +48,7 @@ export class Rutracker implements IProvider {
     Utils.debugLog(
       this.name,
       'fetch',
-      `Fetched data, caching ${this.name}_${query}`
+      `Fetched data, caching with key: [${this.name}_${query}]`
     );
     await app.cache.set(`${this.name}_${query}`, data);
 
