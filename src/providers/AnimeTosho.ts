@@ -1,11 +1,10 @@
 import { toshoUrl } from '../constants.js';
 import { app } from '../index.js';
-import { Utils } from '../utils/Utils.js';
-import { IProvider } from '../interfaces/provider.js';
 import { IToshoData } from '../interfaces/animeTosho.js';
+import { IProvider } from '../interfaces/provider.js';
+import { ITorrentRelease, IUsenetRelease } from '../interfaces/releases.js';
 import { ISneedexRelease } from '../interfaces/sneedex.js';
-import { ITorrentRelease } from '../interfaces/releases.js';
-import { IUsenetRelease } from '../interfaces/releases.js';
+import { Utils } from '../utils/Utils.js';
 
 export class AnimeTosho implements IProvider {
   readonly name: string;
@@ -16,10 +15,15 @@ export class AnimeTosho implements IProvider {
   // provider specific fetch function to retrieve raw data
   private async fetch(query: string): Promise<IToshoData[]> {
     Utils.debugLog(this.name, 'cache', `${this.name}_${query}`);
-    const cachedData = await app.cache.get(`${this.name}_${query}`);
+    const cachedData: IToshoData[] = await app.cache.get(
+      `${this.name}_${query}`
+    );
     if (cachedData) {
       Utils.debugLog(this.name, 'cache', `Cache hit: ${this.name}_${query}`);
-      return cachedData as IToshoData[];
+      cachedData.forEach((data: IToshoData) => {
+        Utils.debugLog(this.name, 'title-result', `${data.title}`);
+      });
+      return cachedData;
     }
     Utils.debugLog(this.name, 'cache', `Cache miss: ${this.name}_${query}`);
 

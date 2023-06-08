@@ -1,10 +1,10 @@
-import { app } from '../index.js';
-import { Utils } from '../utils/Utils.js';
-import { IProvider } from '../interfaces/provider.js';
-import { IRutrackerData } from '../interfaces/rutracker.js';
 import { rutrackerUrl } from '../constants.js';
+import { app } from '../index.js';
+import { IProvider } from '../interfaces/provider.js';
 import { ITorrentRelease } from '../interfaces/releases.js';
+import { IRutrackerData } from '../interfaces/rutracker.js';
 import { ISneedexRelease } from '../interfaces/sneedex.js';
+import { Utils } from '../utils/Utils.js';
 
 export class Rutracker implements IProvider {
   readonly name: string;
@@ -15,10 +15,13 @@ export class Rutracker implements IProvider {
   // provider specific fetch function to retrieve raw data
   private async fetch(query: string): Promise<IRutrackerData> {
     Utils.debugLog(this.name, 'cache', `${this.name}_${query}`);
-    const cachedData = await app.cache.get(`${this.name}_${query}`);
+    const cachedData: IRutrackerData = await app.cache.get(
+      `${this.name}_${query}`
+    );
     if (cachedData) {
       Utils.debugLog(this.name, 'cache', `Cache hit: ${this.name}_${query}`);
-      return cachedData as IRutrackerData;
+      Utils.debugLog(this.name, 'result', `${cachedData.result}`);
+      return cachedData;
     }
     Utils.debugLog(this.name, 'cache', `Cache miss: ${this.name}_${query}`);
 

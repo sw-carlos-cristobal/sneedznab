@@ -1,10 +1,9 @@
 import { Context, Hono, HonoRequest } from 'hono';
-import { IRoute } from '../interfaces/route.js';
-import { rssBuilder } from '../utils/rss.js';
-import { Utils } from '../utils/Utils.js';
 import { app } from '../index.js';
-import { IUsenetRelease } from '../interfaces/releases.js';
-import { ITorrentRelease } from '../interfaces/releases.js';
+import { ITorrentRelease, IUsenetRelease } from '../interfaces/releases.js';
+import { IRoute } from '../interfaces/route.js';
+import { Utils } from '../utils/Utils.js';
+import { rssBuilder } from '../utils/rss.js';
 
 export const apiHono = new Hono();
 export class ApiRoute implements IRoute {

@@ -1,10 +1,10 @@
-import { IProvider } from '../interfaces/provider.js';
-import { INyaaData } from '../interfaces/nyaa.js';
-import { Utils } from '../utils/Utils.js';
-import { app } from '../index.js';
-import { ISneedexRelease } from '../interfaces/sneedex.js';
-import { ITorrentRelease } from '../interfaces/releases.js';
 import { load } from 'cheerio';
+import { app } from '../index.js';
+import { INyaaData } from '../interfaces/nyaa.js';
+import { IProvider } from '../interfaces/provider.js';
+import { ITorrentRelease } from '../interfaces/releases.js';
+import { ISneedexRelease } from '../interfaces/sneedex.js';
+import { Utils } from '../utils/Utils.js';
 
 export class Nyaa implements IProvider {
   readonly name: string;
@@ -15,10 +15,11 @@ export class Nyaa implements IProvider {
   // provider specific fetch function to retrieve raw data
   private async fetch(query: string): Promise<INyaaData> {
     Utils.debugLog(this.name, 'cache', `${this.name}_${query}`);
-    const cachedData = await app.cache.get(`${this.name}_${query}`);
+    const cachedData: INyaaData = await app.cache.get(`${this.name}_${query}`);
     if (cachedData) {
       Utils.debugLog(this.name, 'cache', `Cache hit: ${this.name}_${query}`);
-      return cachedData as INyaaData;
+      Utils.debugLog(this.name, 'title-result', `${cachedData.title}`);
+      return cachedData;
     }
     Utils.debugLog(this.name, 'cache', `Cache miss: ${this.name}_${query}`);
 
