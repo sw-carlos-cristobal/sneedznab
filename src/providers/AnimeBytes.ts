@@ -1,10 +1,10 @@
-import { app } from '../index.js';
-import { Utils } from '../utils/Utils.js';
-import { IProvider } from '../interfaces/provider.js';
-import { IAnimeBytesData } from '../interfaces/animeBytes.js';
 import { animebytesUrl } from '../constants.js';
-import { ISneedexRelease } from '../interfaces/sneedex.js';
+import { app } from '../index.js';
+import { IAnimeBytesData } from '../interfaces/animeBytes.js';
+import { IProvider } from '../interfaces/provider.js';
 import { ITorrentRelease } from '../interfaces/releases.js';
+import { ISneedexRelease } from '../interfaces/sneedex.js';
+import { Utils } from '../utils/Utils.js';
 
 export class AnimeBytes implements IProvider {
   readonly name: string;
@@ -132,7 +132,7 @@ export class AnimeBytes implements IProvider {
             props[4] = "FLAC 2.0"
             props[5] = "Softsubs"
         */
-      const [medium, container, codec, resolution, audio, subs] = props;
+      const [medium, _container, codec, _resolution, audio, _subs] = props;
       // get the bitdepth from codec by splitting it and checking if it has either 10-bit or 8-bit
       // if it has nothing return 8-bit
       const bitDepth =

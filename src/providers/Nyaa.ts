@@ -42,7 +42,7 @@ export class Nyaa implements IProvider {
 
     const $ = load(html);
 
-    const scrapedData = {
+    const scrapedData: INyaaData = {
       title: $('body > div > div:nth-child(1) > div.panel-heading > h3')
         .text()
         .trim(),
@@ -73,7 +73,7 @@ export class Nyaa implements IProvider {
     );
     await app.cache.set(`${this.name}_${query}`, scrapedData);
 
-    return scrapedData as INyaaData;
+    return scrapedData;
   }
 
   public async get(

@@ -41,7 +41,7 @@ export class Rutracker implements IProvider {
 
     Utils.debugLog(this.name, 'fetch', query);
     Utils.debugLog(this.name, 'fetch', `Fetching data from ${searchURL}`);
-    const data = await fetch(searchURL).then((res) => {
+    const data: IRutrackerData = await fetch(searchURL).then((res) => {
       if (!res.ok) throw new Error(res.statusText);
       return res.json();
     });
@@ -52,7 +52,7 @@ export class Rutracker implements IProvider {
     );
     await app.cache.set(`${this.name}_${query}`, data);
 
-    return data as IRutrackerData;
+    return data;
   }
 
   // get function to standardize the returned data to make things easier to work with and plug-and-play
