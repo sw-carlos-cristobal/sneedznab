@@ -1,42 +1,48 @@
-import { nyaaUrl } from '#/constants'
-import {
-  INyaaData,
-  IProvider,
-  ITorrentRelease,
-  ISneedexRelease
-} from '#interfaces/index'
-import { app } from '#/index'
-import { Utils } from '#utils/Utils'
-import { load } from 'cheerio'
+import { load } from 'cheerio';
+import { app } from '../index.js';
+import { INyaaData } from '../interfaces/nyaa.js';
+import { IProvider } from '../interfaces/provider.js';
+import { ITorrentRelease } from '../interfaces/releases.js';
+import { ISneedexRelease } from '../interfaces/sneedex.js';
+import { Utils } from '../utils/Utils.js';
 
 export class Nyaa implements IProvider {
-  readonly name: string
+  readonly name: string;
   constructor() {
-    this.name = 'Nyaa'
+    this.name = 'Nyaa';
   }
 
   // provider specific fetch function to retrieve raw data
   private async fetch(query: string): Promise<INyaaData> {
-    Utils.debugLog(this.name, 'cache', `${this.name}_${query}`)
-    const cachedData = await app.cache.get(`${this.name}_${query}`)
+    Utils.debugLog(this.name, 'cache', `${this.name}_${query}`);
+    const cachedData: INyaaData = await app.cache.get(`${this.name}_${query}`);
     if (cachedData) {
-      Utils.debugLog(this.name, 'cache', `Cache hit: ${this.name}_${query}`)
-      return cachedData as INyaaData
+      Utils.debugLog(
+        this.name,
+        'cache',
+        `Cache hit with key: [${this.name}_${query}]`
+      );
+      Utils.debugLog(this.name, 'title-result', `${cachedData.title}`);
+      return cachedData;
     }
-    Utils.debugLog(this.name, 'cache', `Cache miss: ${this.name}_${query}`)
+    Utils.debugLog(
+      this.name,
+      'cache',
+      `Cache miss with key: [${this.name}_${query}]`
+    );
 
-    const scrapeUrl = `https://nyaa.si/view/${query}`
-    Utils.debugLog(this.name, 'fetch', query)
-    Utils.debugLog(this.name, 'fetch', `Fetching data from ${scrapeUrl}`)
+    const scrapeUrl = `https://nyaa.si/view/${query}`;
+    Utils.debugLog(this.name, 'fetch', query);
+    Utils.debugLog(this.name, 'fetch', `Fetching data from ${scrapeUrl}`);
     // Scrape the HTML for the info
-    const html = await fetch(scrapeUrl).then(res => {
-      if (!res.ok) throw new Error(res.statusText)
-      return res.text()
-    })
+    const html = await fetch(scrapeUrl).then((res) => {
+      if (!res.ok) throw new Error(res.statusText);
+      return res.text();
+    });
 
-    const $ = load(html)
+    const $ = load(html);
 
-    const scrapedData = {
+    const scrapedData: INyaaData = {
       title: $('body > div > div:nth-child(1) > div.panel-heading > h3')
         .text()
         .trim(),
@@ -58,16 +64,16 @@ export class Nyaa implements IProvider {
         '.torrent-file-list > ul:nth-child(1) > li:nth-child(1) > ul:nth-child(2)'
       ).find('li').length,
       id: +query
-    }
+    };
 
     Utils.debugLog(
       this.name,
       'fetch',
-      `Fetched data, caching ${this.name}_${query}`
-    )
-    await app.cache.set(`${this.name}_${query}`, scrapedData)
+      `Fetched data, caching with key: [${this.name}_${query}]`
+    );
+    await app.cache.set(`${this.name}_${query}`, scrapedData);
 
-    return scrapedData as INyaaData
+    return scrapedData;
   }
 
   public async get(
@@ -102,43 +108,43 @@ export class Nyaa implements IProvider {
 
     const bestReleaseLinks = sneedexData.best_links.length
       ? sneedexData.best_links.split(' ')
-      : sneedexData.alt_links.split(' ')
+      : sneedexData.alt_links.split(' ');
 
     // get each Nyaa link and scrape the page
     const nyaaLinks = bestReleaseLinks.filter((url: string) =>
       url.includes('nyaa.si/view/')
-    )
+    );
     const nyaaIDs = nyaaLinks.length
       ? nyaaLinks.map((url: string) => +url.match(/nyaa.si\/view\/(\d+)/)[1])
-      : null
+      : null;
 
     // for each nyaaID, scrape the page and return the data
     const nyaaData = nyaaIDs
       ? await Promise.all(
           nyaaIDs.map(async (nyaaID: number) => {
-            const nyaaData = await this.fetch(`${nyaaID}`)
-            return nyaaData
+            const nyaaData = await this.fetch(`${nyaaID}`);
+            return nyaaData;
           })
         )
-      : null
+      : null;
 
     // if there's no nyaa data, return null
-    if (!nyaaData) return null
+    if (!nyaaData) return null;
 
     // format the data into an array of ITorrentReleases
     const releases: ITorrentRelease[] = nyaaData.map((data: INyaaData) => {
-      const size = data.size.split(' ')
+      const size = data.size.split(' ');
       const sizeInBytes =
         size[1] === 'GiB'
           ? +size[0] * 1024 * 1024 * 1024
-          : +size[0] * 1024 * 1024
+          : +size[0] * 1024 * 1024;
 
       // remove decimal places from the size in bytes to comply with Torznab
-      const sizeInBytesRounded = Math.round(sizeInBytes)
+      const sizeInBytesRounded = Math.round(sizeInBytes);
 
       const formattedDate = Utils.formatDate(
         new Date(data.date.replace(' UTC', '')).getTime()
-      )
+      );
 
       return {
         title: data.title,
@@ -152,9 +158,9 @@ export class Nyaa implements IProvider {
         timestamp: formattedDate,
         grabs: data.completed,
         type: 'torrent'
-      }
-    })
+      };
+    });
 
-    return releases as ITorrentRelease[]
+    return releases as ITorrentRelease[];
   }
 }

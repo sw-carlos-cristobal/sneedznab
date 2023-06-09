@@ -1,7 +1,7 @@
-import { Hono } from 'hono'
+import { Hono } from 'hono';
 
 export interface IRoute {
-  path: string
-  router: Hono
-  getRouter(): Hono
+  path: string;
+  router: Hono;
+  getRouter(): Hono;
 }

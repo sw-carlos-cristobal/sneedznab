@@ -13,10 +13,12 @@
       "error",
       {
         "singleQuote": true,
-        "semi": false,
-        "arrowParens": "avoid",
-        "trailingComma": "none"
+        "semi": true,
+        "arrowParens": "always",
+        "trailingComma": "none",
+        "endOfLine": "auto"
       }
-    ]
+    ],
+    "no-trailing-spaces": "error"
   }
 }

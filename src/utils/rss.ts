@@ -1,4 +1,4 @@
-import { ITorrentRelease, IUsenetRelease } from '#interfaces/index'
+import { ITorrentRelease, IUsenetRelease } from '#interfaces/index';
 
 export const escape = (str: string): string => {
   // replace ampersands with &amp;
@@ -12,8 +12,8 @@ export const escape = (str: string): string => {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
-    .replace(/'/g, '&apos;')
-}
+    .replace(/'/g, '&apos;');
+};
 
 export const rssBuilder = (
   usenetReleases: IUsenetRelease[],
@@ -27,7 +27,7 @@ export const rssBuilder = (
 			<title>Sneedex</title>
 			${usenetReleases
         .map(
-          release => `
+          (release) => `
 				  <item>
 					<title>${escape(release.title)}</title>
 					<description />
@@ -54,7 +54,7 @@ export const rssBuilder = (
         .join('')}
 			${torrentReleases
         .map(
-          release => `
+          (release) => `
 				  <item>
 					<title>${escape(release.title)}</title>
 					<description />
@@ -83,5 +83,5 @@ export const rssBuilder = (
         )
         .join('')}
 		  </channel>
-		</rss>`
-}
+		</rss>`;
+};
