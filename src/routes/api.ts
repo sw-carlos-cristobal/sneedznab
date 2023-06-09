@@ -65,15 +65,24 @@ export class ApiRoute implements IRoute {
 
         if (cachedData) {
           Utils.debugLog('API', 'cache', `Cache hit with key: [api_${query}]`);
-          if (returnType === 'json') return makeResponseJson(cachedData);
+          if (returnType === 'json') {
+            const jsonResponse = makeResponseJson(cachedData);
+            const logBody = jsonResponse.clone();
+            Utils.debugLog('API', 'json-response', await logBody.text());
+            return jsonResponse;
+          }
 
-          return makeResponseBody(
+          const responseBody: Response = makeResponseBody(
             rssBuilder(cachedData.usenetReleases, cachedData.torrentReleases),
             200,
             {
-              application: 'rss+xml'
+              application: 'rss+xml',
+              'content-type': 'application/rss+xml'
             }
           );
+          const logBody = responseBody.clone();
+          Utils.debugLog('API', 'rss-response', await logBody.text());
+          return responseBody;
         }
         Utils.debugLog('API', 'cache', `Cache miss: [api_${query}]`);
 
